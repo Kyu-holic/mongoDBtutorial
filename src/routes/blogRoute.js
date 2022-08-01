@@ -1,8 +1,10 @@
 const { Router } = require("express");
 const blogRouter = Router();
-const { Blog } = require("../models/Blog");
-const { User } = require("../models/User");
+const { Blog, User } = require("../models");
 const { isValidObjectId } = require("mongoose");
+const { commentRouter } = require("./commentRoute");
+
+blogRouter.use("/:blogId/comment", commentRouter);
 
 blogRouter.post("/", async (req, res) => {
   try {
@@ -78,6 +80,20 @@ blogRouter.put("/:blogId", async (req, res) => {
 // put은 블로그 전체적인 것을 수정할 때, patch는 부분적으로 수정할 때
 blogRouter.patch("/:blogId/live", async (req, res) => {
   try {
+    const { blogId } = req.params;
+    if (!isValidObjectId(blogId))
+      res.status(400).send({ err: "blogId is invalid" });
+
+    const { islive } = req.body;
+    if (typeof islive !== "boolean")
+      res.status(400).send({ err: "boolean islive is required" });
+
+    const blog = await Blog.findByIdAndUpdate(
+      blogId,
+      { islive },
+      { new: true }
+    );
+    return res.send({ blog });
   } catch (err) {
     console.log(err);
     return res.status(500).send({ err: err.message });

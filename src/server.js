@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
-const { userRouter } = require("./routes/userRouter");
-const { blogRouter } = require("./routes/blogRoute");
+const { userRouter, blogRouter } = require("./routes");
 const mongoose = require("mongoose");
 
 const MONGO_URI =
@@ -15,6 +14,7 @@ const server = async () => {
 
     app.use("/user", userRouter);
     app.use("/blog", blogRouter);
+  
 
     app.listen(3000, () => {
       console.log("server listening on port 3000");
